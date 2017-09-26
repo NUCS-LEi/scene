@@ -13,7 +13,7 @@ tf.app.flags.DEFINE_string('restore_checkpoint', None,
                            'Path to restore checkpoint (without postfix), e.g. .\\logs\\train\\model.ckpt-100')
 tf.app.flags.DEFINE_integer('batch_size', 32, 'Default 32')
 tf.app.flags.DEFINE_float('learning_rate', 1e-2, 'Default 1e-2')
-tf.app.flags.DEFINE_integer('patience', 2, 'Default 100, set -1 to train infinitely')
+tf.app.flags.DEFINE_integer('patience', 20, 'Default 100, set -1 to train infinitely')
 tf.app.flags.DEFINE_integer('decay_steps', 10000, 'Default 10000')
 tf.app.flags.DEFINE_float('decay_rate', 0.9, 'Default 0.9')
 FLAGS = tf.app.flags.FLAGS
