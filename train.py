@@ -13,7 +13,7 @@ tf.app.flags.DEFINE_string('restore_checkpoint', None,
                            'Path to restore checkpoint (without postfix), e.g. .\\logs\\train\\model.ckpt-100')
 tf.app.flags.DEFINE_integer('batch_size', 32, 'Default 32')
 tf.app.flags.DEFINE_float('learning_rate', 1e-2, 'Default 1e-2')
-tf.app.flags.DEFINE_integer('patience', 100, 'Default 100, set -1 to train infinitely')
+tf.app.flags.DEFINE_integer('patience', 2, 'Default 100, set -1 to train infinitely')
 tf.app.flags.DEFINE_integer('decay_steps', 10000, 'Default 10000')
 tf.app.flags.DEFINE_float('decay_rate', 0.9, 'Default 0.9')
 FLAGS = tf.app.flags.FLAGS
@@ -27,12 +27,12 @@ def _train(path_to_train_tfrecords_file, num_train_examples, path_to_val_tfrecor
     num_steps_to_check = 1000
 
     with tf.Graph().as_default():
-        image_batch, length_batch, digits_batch = Donkey.build_batch(path_to_train_tfrecords_file,
+        image_batch, label_batch = Donkey.build_batch(path_to_train_tfrecords_file,
                                                                      num_examples=num_train_examples,
                                                                      batch_size=batch_size,
                                                                      shuffled=True)
-        length_logtis, digits_logits = Model.inference(image_batch, drop_rate=0.2)
-        loss = Model.loss(length_logtis, digits_logits, length_batch, digits_batch)
+        label_logits = Model.inference(image_batch, drop_rate=0.2)
+        loss = Model.loss(label_logits, label_batch)
 
         global_step = tf.Variable(0, name='global_step', trainable=False)
         learning_rate = tf.train.exponential_decay(training_options['learning_rate'], global_step=global_step,
