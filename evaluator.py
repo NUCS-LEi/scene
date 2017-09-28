@@ -13,28 +13,29 @@ class Evaluator(object):
         needs_include_length = False
 
         with tf.Graph().as_default():
-            image_batch, length_batch, digits_batch = Donkey.build_batch(path_to_tfrecords_file,
-                                                                         num_examples=num_examples,
-                                                                         batch_size=batch_size,
-                                                                         shuffled=False)
-            length_logits, digits_logits = Model.inference(image_batch, drop_rate=0.0)
-            length_predictions = tf.argmax(length_logits, axis=1)
-            digits_predictions = tf.argmax(digits_logits, axis=2)
-
-            if needs_include_length:
-                labels = tf.concat([tf.reshape(length_batch, [-1, 1]), digits_batch], axis=1)
-                predictions = tf.concat([tf.reshape(length_predictions, [-1, 1]), digits_predictions], axis=1)
-            else:
-                labels = digits_batch
-                predictions = digits_predictions
-
-            labels_string = tf.reduce_join(tf.as_string(labels), axis=1)
-            predictions_string = tf.reduce_join(tf.as_string(predictions), axis=1)
-
-            accuracy, update_accuracy = tf.metrics.accuracy(
-                labels=labels_string,
-                predictions=predictions_string
+            image_batch, lable_batch = Donkey.build_batch(path_to_tfrecords_file,
+                                                                 num_examples=num_examples,
+                                                                 batch_size=batch_size,
+                                                                 shuffled=False)
+            label_logits = Model.inference(image_batch, drop_rate=0.0)
+            label_predictions1 = tf.argmax(label_logits[:,0], axis=1)
+            label_predictions2 = tf.argmax(label_logits[:,1], axis=1)
+            label_predictions3 = tf.argmax(label_logits[:,2], axis=1)
+            accuracy1, update_accuracy1 = tf.metrics.accuracy(
+                labels=lable_batch,
+                predictions=label_predictions1
             )
+            accuracy2, update_accuracy2 = tf.metrics.accuracy(
+                labels=lable_batch,
+                predictions=label_predictions2
+            )
+            accuracy3, update_accuracy3 = tf.metrics.accuracy(
+                labels=lable_batch,
+                predictions=label_predictions3
+            )
+            accuracy = accuracy1 + accuracy2 + accuracy3
+            update_accuracy = update_accuracy1 + update_accuracy2 + update_accuracy3
+        
 
             tf.summary.image('image', image_batch)
             tf.summary.scalar('accuracy', accuracy)
